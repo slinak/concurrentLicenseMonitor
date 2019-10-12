@@ -29,8 +29,8 @@ public class SessionEventTriggerAccessor : IDynamicSessionEventTrigger
 		{
 			using (var mailMessage = ServerToolkit.Instance.CreateMailMessage())
 			{
-				if (!string.IsNullOrEmpty(context.GetSettingValue("ToEmailAddress")))
-					mailMessage.To.Add(context.GetSettingValue("ToEmailAddress"));
+				if (!string.IsNullOrEmpty(context.GetSettingValue("EmailToAddress")))
+					mailMessage.To.Add(context.GetSettingValue("EmailToAddress"));
 				else
 					mailMessage.To.Add(AppSettingsCache.DefaultMailToAddress);
 				
