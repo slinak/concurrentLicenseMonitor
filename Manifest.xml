@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ExtensionManifest>
+	<Version>1.0</Version>
+	<Name>Concurrent Usage Monitor</Name>
+	<Author>swlinak</Author>
+	<ShortDescription>Sends an email when a specific number of concurrent sessions has been reached.</ShortDescription>
+	<Components>
+		<DynamicSessionEventTriggerDefinition SourceFile="SessionEventTrigger.cs" MinProductVersionInclusive="19.0" />
+	</Components>
+	<Settings>
+		<Setting Name="ConcurrentLicenseTargetCount">
+			<Description>The number of Active Connections to monitor.</Description>
+			<DefaultValue>5</DefaultValue>
+		</Setting>
+		<Setting Name="ToEmailAddress">
+			<Description>The email address to which the message should be sent.</Description>
+			<DefaultValue></DefaultValue>
+		</Setting>
+		<Setting Name="EmailSubject">
+			<Description>The email message subject.</Description>
+			<DefaultValue>Concurrent License Limit Reached</DefaultValue>
+		</Setting>
+		<Setting Name="EmailBody">
+			<Description>The email message body.</Description>
+			<DefaultValue></DefaultValue>
+		</Setting>
+	</Settings>
+</ExtensionManifest>
