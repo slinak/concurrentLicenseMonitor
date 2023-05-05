@@ -1,29 +1,26 @@
 using System;
-using ScreenConnect;
 using System.Linq;
+using System.Threading.Tasks;
+using System.Collections.Generic;
+using ScreenConnect;
 
-public class SessionEventTriggerAccessor : IDynamicSessionEventTrigger
+public class SessionEventTriggerAccessor : IAsyncDynamicEventTrigger<SessionEventTriggerEvent>
 {
-	public Proc GetDeferredActionIfApplicable(SessionEventTriggerEvent sessionEventTriggerEvent)
+	public async Task ProcessEventAsync(SessionEventTriggerEvent sessionEventTriggerEvent)
 	{
-		if(sessionEventTriggerEvent.SessionEvent.EventType == SessionEventType.Connected && 
-			sessionEventTriggerEvent.SessionConnection.ProcessType == ProcessType.Host) 
+		if (sessionEventTriggerEvent.SessionEvent.EventType == SessionEventType.Connected && 
+			sessionEventTriggerEvent.Connection.ProcessType == ProcessType.Host) 
 		{
 			int licenseLimit = Convert.ToInt32(ExtensionContext.Current.GetSettingValue("ConcurrentLicenseTargetCount"));
 			
-			SessionActiveConnection[] activeSessions = SessionManagerPool.Demux.GetSessions()
-				.Where(session => session.ActiveConnections.Length > 0)
-				.SelectMany(session => session.ActiveConnections)
-				.Where(ac => ac.ProcessType == ProcessType.Host)
-				.ToArray();
+			var activeSessions = await SessionManagerPool.Demux.GetSessionsAsync("HostConnectedCount > 0");
 				
-			if(activeSessions.Length >= licenseLimit)
-				SendEmail(ExtensionContext.Current);
+			if(activeSessions.Count >= licenseLimit)
+				await SendEmail(ExtensionContext.Current);
 		}
-		return null;
 	}
 	
-	public static void SendEmail(ExtensionContext context)
+	async Task SendEmail(ExtensionContext context)
 	{
 		try
 		{
@@ -39,7 +36,7 @@ public class SessionEventTriggerAccessor : IDynamicSessionEventTrigger
 				mailMessage.Body = context.GetSettingValue("EmailBody");
 	
 				mailMessage.IsBodyHtml = false;
-				new ScreenConnect.SmtpClient().Send(mailMessage);
+				await new ScreenConnect.SmtpClient().SendMailAsync(mailMessage);
 			}
 		} 
 		catch (Exception)
